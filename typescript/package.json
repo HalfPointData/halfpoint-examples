@@ -1,0 +1,15 @@
+{
+  "name": "halfpoint-examples-typescript",
+  "private": true,
+  "description": "HalfPoint API examples with fetch (Node 20+), no dependencies",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "odds": "npx -y tsx odds.ts",
+    "stream": "npx -y tsx odds-stream.ts",
+    "typecheck": "npx -y -p typescript tsc --noEmit"
+  },
+  "license": "MIT"
+}
