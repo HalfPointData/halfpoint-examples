@@ -62,7 +62,7 @@ def main() -> None:
 
     key = os.environ.get("HALFPOINT_API_KEY")
     if key:
-        url, interval = f"{ODDS}/odds?league={league}", 10  # seconds between polls
+        url, interval = f"{ODDS}/odds?league={league}", 1  # seconds between polls, as curl/etag-polling.sh
     else:
         url, interval = f"{ODDS}/sample/odds?league={league}", 90  # the sample is delayed
         print("No HALFPOINT_API_KEY: polling the delayed sample.", file=sys.stderr)
