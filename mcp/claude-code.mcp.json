@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "halfpoint": {
+      "type": "http",
+      "url": "https://mcp.halfpoint.tech/",
+      "headers": {
+        "X-Api-Key": "${HALFPOINT_API_KEY}"
+      }
+    }
+  }
+}
