@@ -58,8 +58,10 @@ if (!fixtureId || !outcome || books.length === 0) {
 } else {
   const fixture = answer.fixtures.find((f) => f.id === fixtureId) ?? fail(`${fixtureId}: not in this answer`);
   const price = Object.values(fixture.markets)[0]; // moneyline, or moneyline_3way
-  const p = price?.[outcome as "home" | "away" | "draw"];
+  const known = outcome === "away" || outcome === "draw" || outcome === "home";
+  const p = known ? price?.[outcome] : undefined;
   if (!price || p === undefined) fail(`${fixtureId}: no fair price for ${outcome}`);
+  if (!(p > 0 && p < 1)) fail(`${fixtureId}: no fair odds for ${outcome} at p = ${p}`);
   if (!price.recent) fail(`${fixtureId}: the fair price is not recent: a reference, not a price`);
   console.log(`${fixtureId} ${outcome}: fair p ${p.toFixed(3)}, fair odds ${(1 / p).toFixed(2)} (at ${price.at})\n`);
 

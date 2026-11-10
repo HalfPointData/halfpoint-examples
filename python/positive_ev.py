@@ -18,6 +18,7 @@ Docs: https://docs.halfpoint.tech/endpoints/odds/
 from __future__ import annotations
 
 import json
+import math
 import os
 import sys
 import urllib.error
@@ -45,12 +46,15 @@ def get(url: str, key: str | None = None) -> dict:
 
 def decimal_odds(text: str) -> float:
     """Decimal odds from `2.45`, `+145` or `-120`."""
+    value = float(text)
+    if not math.isfinite(value):
+        raise ValueError(f"not a number: {text}")
     if text.startswith(("+", "-")):
-        american = float(text)
+        american = value
         if abs(american) < 100:
             raise ValueError(f"American odds must be at least 100 away from 0: {text}")
         return 1 + american / 100 if american > 0 else 1 + 100 / -american
-    odds = float(text)
+    odds = value
     if odds <= 1:
         raise ValueError(f"decimal odds must be above 1: {text}")
     return odds
@@ -90,6 +94,9 @@ def main() -> None:
         # No book prices given: list the fair odds. A book price above them has a positive EV.
         print(f"{'fixture':<28} {'outcome':<8} {'fair p':>7} {'decimal':>8} {'american':>9}")
         for (fixture_id, outcome), (p, recent) in fair.items():
+            if not 0 < p < 1:
+                print(f"{fixture_id:<28} {outcome:<8} {p:>7.3f}  no fair odds for p = {p}")
+                continue
             note = "" if recent else "  not recent: a reference, not a price"
             print(f"{fixture_id:<28} {outcome:<8} {p:>7.3f} {1 / p:>8.2f} "
                   f"{american_odds(1 / p):>9}{note}")
@@ -111,6 +118,8 @@ def main() -> None:
             continue
         rows.append((p * odds - 1, p - 1 / odds, p, odds, fixture_id, outcome))
 
+    if not rows:
+        sys.exit("no price could be compared")
     print(f"{'fixture':<28} {'outcome':<8} {'odds':>6} {'implied':>8} {'fair p':>7} "
           f"{'diff':>8} {'EV':>7}")
     for ev, diff, p, odds, fixture_id, outcome in sorted(rows, reverse=True):

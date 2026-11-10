@@ -18,6 +18,7 @@ Docs: https://docs.halfpoint.tech/endpoints/odds/
 from __future__ import annotations
 
 import json
+import math
 import os
 import sys
 import urllib.error
@@ -45,12 +46,15 @@ def get(url: str, key: str | None = None) -> dict:
 
 def decimal_odds(text: str) -> float:
     """Decimal odds from `2.45`, `+145` or `-120`."""
+    value = float(text)
+    if not math.isfinite(value):
+        raise ValueError(f"not a number: {text}")
     if text.startswith(("+", "-")):
-        american = float(text)
+        american = value
         if abs(american) < 100:
             raise ValueError(f"American odds must be at least 100 away from 0: {text}")
         return 1 + american / 100 if american > 0 else 1 + 100 / -american
-    odds = float(text)
+    odds = value
     if odds <= 1:
         raise ValueError(f"decimal odds must be above 1: {text}")
     return odds
@@ -78,11 +82,13 @@ def main() -> None:
     fixture_id, outcome, books = sys.argv[2], sys.argv[3], sys.argv[4:]
     fixture = fixtures.get(fixture_id) or sys.exit(f"{fixture_id}: not in this answer")
     price = next(iter(fixture["markets"].values()), None)  # moneyline, or moneyline_3way
-    if not price or outcome not in price:
+    if not price or outcome not in ("away", "draw", "home") or outcome not in price:
         sys.exit(f"{fixture_id}: no fair price for {outcome}")
     if not price.get("recent", True):
         sys.exit(f"{fixture_id}: the fair price is not recent: a reference, not a price")
     p = price[outcome]
+    if not 0 < p < 1:
+        sys.exit(f"{fixture_id}: no fair odds for {outcome} at p = {p}")
     print(f"{fixture_id} {outcome}: fair p {p:.3f}, fair odds {1 / p:.2f} (at {price['at']})\n")
 
     rows = []

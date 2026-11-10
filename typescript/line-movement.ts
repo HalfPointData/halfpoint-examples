@@ -22,7 +22,7 @@ if (!league) fail("usage: line-movement.ts <league> [<fixture id>]");
 
 const key = env.HALFPOINT_API_KEY;
 const url = key ? `${ODDS}/odds?league=${league}` : `${ODDS}/sample/odds?league=${league}`;
-const interval = key ? 1000 : 10_000; // ms between polls; the sample as in curl/etag-polling.sh
+const interval = key ? 10_000 : 90_000; // ms between polls; the sample is delayed
 if (!key) console.error("No HALFPOINT_API_KEY: polling the delayed sample.");
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -39,9 +39,11 @@ async function poll(): Promise<OddsAnswer | null> {
   if (!response.ok) {
     const text = (await response.text()).trim();
     const retry = response.headers.get("Retry-After");
-    if (response.status === 429 && retry) {
-      console.error(`429: ${text}; waiting ${retry} s`);
-      await sleep(Number(retry) * 1000);
+    if (response.status === 429) {
+      const wait = Number(retry); // no usable Retry-After: the caller waits its interval
+      const usable = retry !== null && Number.isInteger(wait) && wait > 0;
+      console.error(usable ? `429: ${text}; waiting ${wait} s` : `429: ${text}`);
+      if (usable) await sleep(wait * 1000);
       return null;
     }
     fail(`${response.status} from ${url}: ${text}`);
@@ -66,7 +68,9 @@ for (;;) {
       console.log(`following ${fixtureId}`);
     }
     const fixture = answer.fixtures.find((f) => f.id === fixtureId);
-    if (!fixture) {
+    if (!fixtureId) {
+      console.error(`${answer.updated} no fixtures in this league yet`);
+    } else if (!fixture) {
       console.error(`${answer.updated} ${fixtureId} not listed`);
     } else {
       for (const [market, price] of Object.entries(fixture.markets)) {

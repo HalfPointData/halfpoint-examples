@@ -42,9 +42,14 @@ def poll(url: str, key: str | None, etag: str | None) -> tuple[dict | None, str 
             return None, etag
         body = err.read().decode("utf-8", "replace").strip()
         retry = err.headers.get("Retry-After")
-        if err.code == 429 and retry:
-            print(f"429: {body}; waiting {retry} s", file=sys.stderr)
-            time.sleep(int(retry))
+        if err.code == 429:
+            try:
+                wait = int(retry or "")
+            except ValueError:
+                wait = None  # no usable Retry-After: the caller waits its interval
+            print(f"429: {body}; waiting {wait} s" if wait else f"429: {body}", file=sys.stderr)
+            if wait:
+                time.sleep(wait)
             return None, etag
         sys.exit(f"{err.code} from {url}: {body}")
 
@@ -57,9 +62,9 @@ def main() -> None:
 
     key = os.environ.get("HALFPOINT_API_KEY")
     if key:
-        url, interval = f"{ODDS}/odds?league={league}", 1  # seconds between polls
+        url, interval = f"{ODDS}/odds?league={league}", 10  # seconds between polls
     else:
-        url, interval = f"{ODDS}/sample/odds?league={league}", 10  # as curl/etag-polling.sh
+        url, interval = f"{ODDS}/sample/odds?league={league}", 90  # the sample is delayed
         print("No HALFPOINT_API_KEY: polling the delayed sample.", file=sys.stderr)
 
     etag = None
@@ -78,7 +83,9 @@ def main() -> None:
                 fixture_id = fixtures[0]["id"]
                 print(f"following {fixture_id}")
             fixture = next((f for f in fixtures if f["id"] == fixture_id), None)
-            if fixture is None:
+            if fixture_id is None:
+                print(f"{answer['updated']} no fixtures in this league yet", file=sys.stderr)
+            elif fixture is None:
                 print(f"{answer['updated']} {fixture_id} not listed", file=sys.stderr)
             else:
                 for market, price in fixture["markets"].items():
