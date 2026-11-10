@@ -9,6 +9,9 @@
   "scripts": {
     "odds": "npx -y tsx odds.ts",
     "stream": "npx -y tsx odds-stream.ts",
+    "positive-ev": "npx -y tsx positive-ev.ts",
+    "distance": "npx -y tsx distance-from-fair.ts",
+    "line-movement": "npx -y tsx line-movement.ts",
     "typecheck": "npx -y -p typescript tsc --noEmit"
   },
   "license": "MIT"

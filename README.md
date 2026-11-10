@@ -77,6 +77,16 @@ curl -H "X-Api-Key: $HALFPOINT_API_KEY" "https://odds.halfpoint.tech/odds?league
 | [`x402/`](x402/) | pay per request for `/odds` with x402 in USDC on Base (needs a funded wallet) |
 | [`mcp/`](mcp/) | MCP client configs for Claude Code, Cursor and Claude Desktop |
 
+Fair price examples, in [`python/`](python/) and [`typescript/`](typescript/):
+
+| example | what |
+|---------|------|
+| positive EV ([`positive_ev.py`](python/positive_ev.py), [`positive-ev.ts`](typescript/positive-ev.ts)) | compares sportsbook prices you pass with the fair price and prints the edge and the EV |
+| distance from fair ([`distance_from_fair.py`](python/distance_from_fair.py), [`distance-from-fair.ts`](typescript/distance-from-fair.ts)) | for one outcome, how far each sportsbook price is from the fair price |
+| line movement ([`line_movement.py`](python/line_movement.py), [`line-movement.ts`](typescript/line-movement.ts)) | polls the fair price of one game with ETag and prints each change |
+
+Coding agents: start with [`AGENTS.md`](AGENTS.md). Short guides by question are in [`docs/`](docs/).
+
 ## Plans
 
 | | Consensus | Realtime | Risk |
