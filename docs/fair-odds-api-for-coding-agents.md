@@ -8,7 +8,7 @@ What an agent can read without a key:
 - https://docs.halfpoint.tech/llms.txt lists every documentation page as Markdown.
 - Both API hosts serve an OpenAPI 3.0 description of every route, its parameters and errors, without a key.
 
-You can use it over REST with an API key, or as tools over MCP. An MCP server (streamable HTTP) at https://mcp.halfpoint.tech/ offers the same data as tools. Without a key, only `get_sample` and `get_pass_options` answer.
+You can use it over REST with an API key, or as tools over MCP. An MCP server (streamable HTTP) at https://mcp.halfpoint.tech/ offers the same data as tools. Without a key, only get_sample and get_pass_options answer.
 
 - Examples: [positive EV](../python/positive_ev.py), [distance from fair](../python/distance_from_fair.py), [line movement](../python/line_movement.py), with TypeScript versions in [`typescript/`](../typescript/)
 - MCP client configs: [`mcp/`](../mcp/)
