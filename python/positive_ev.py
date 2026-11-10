@@ -5,12 +5,12 @@ Standard library only (Python 3.9+). You pass the sportsbook prices as arguments
 `-120`). Outcomes are `home`, `away` and, in soccer, `draw`.
 
     python3 positive_ev.py nba                                  # fair odds from the sample, no key
-    python3 positive_ev.py nba nba-261110-cle-cha:home:+150     # the edge of one book price
+    python3 positive_ev.py nba nba-261110-cle-cha:home:+150     # the EV of one book price
     HALFPOINT_API_KEY=hp_... python3 positive_ev.py nba ...     # against the current /odds
 
-For each price it prints the fair probability p, the book's implied probability 1/odds, the edge
-p - 1/odds, and the expected value per unit staked, p * odds - 1. A positive EV means the book
-pays more than the fair price.
+For each price it prints the fair probability p, the book's implied probability 1/odds, the
+difference (p - 1/odds) * 100 in percentage points, and the expected value per unit staked,
+p * odds - 1. A positive EV means the book pays more than the fair price.
 
 Docs: https://docs.halfpoint.tech/endpoints/odds/
 """
@@ -112,11 +112,11 @@ def main() -> None:
         rows.append((p * odds - 1, p - 1 / odds, p, odds, fixture_id, outcome))
 
     print(f"{'fixture':<28} {'outcome':<8} {'odds':>6} {'implied':>8} {'fair p':>7} "
-          f"{'edge':>7} {'EV':>7}")
-    for ev, edge, p, odds, fixture_id, outcome in sorted(rows, reverse=True):
+          f"{'diff':>8} {'EV':>7}")
+    for ev, diff, p, odds, fixture_id, outcome in sorted(rows, reverse=True):
         mark = "  +EV" if ev > 0 else ""
         print(f"{fixture_id:<28} {outcome:<8} {odds:>6.2f} {1 / odds:>8.3f} {p:>7.3f} "
-              f"{edge:>+7.3f} {ev:>+7.1%}{mark}")
+              f"{diff * 100:>+6.1f}pp {ev:>+7.1%}{mark}")
 
 
 if __name__ == "__main__":

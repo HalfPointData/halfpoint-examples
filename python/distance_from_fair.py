@@ -1,7 +1,7 @@
-"""Distance from fair: how far each sportsbook price for one outcome is from HalfPoint's fair price.
+"""Distance from fair: how far a sportsbook price you pass is from HalfPoint's fair price.
 
-Standard library only (Python 3.9+). You pass the fixture, the outcome and one price per book,
-each `[book=]odds`. Odds are decimal (`2.45`) or American (`+145`, `-120`). Outcomes are `home`,
+Standard library only (Python 3.9+). You pass the fixture, the outcome and the prices, each
+`[book=]odds`. Odds are decimal (`2.45`) or American (`+145`, `-120`). Outcomes are `home`,
 `away` and, in soccer, `draw`.
 
     python3 distance_from_fair.py nba                           # list fixture ids (the sample)
