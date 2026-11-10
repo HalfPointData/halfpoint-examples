@@ -71,6 +71,10 @@ if (wanted.length === 0) {
   // No book prices given: list the fair odds. A book price above them has a positive EV.
   console.log(`${"fixture:outcome".padEnd(36)} ${"fair p".padStart(7)} ${"decimal".padStart(8)} ${"american".padStart(9)}`);
   for (const [name, { p, recent }] of fair) {
+    if (!(p > 0 && p < 1)) {
+      console.log(`${name.padEnd(36)} ${p.toFixed(3).padStart(7)}  no fair odds for p = ${p}`);
+      continue;
+    }
     const note = recent ? "" : "  not recent: a reference, not a price";
     console.log(`${name.padEnd(36)} ${p.toFixed(3).padStart(7)} ${(1 / p).toFixed(2).padStart(8)} ${americanOdds(1 / p).padStart(9)}${note}`);
   }
@@ -93,6 +97,7 @@ if (wanted.length === 0) {
     rows.push({ name, odds, p: entry.p, diff: entry.p - 1 / odds, ev: entry.p * odds - 1 });
   }
 
+  if (rows.length === 0) fail("no price could be compared");
   console.log(`${"fixture:outcome".padEnd(36)} ${"odds".padStart(6)} ${"implied".padStart(8)} ${"fair p".padStart(7)} ${"diff".padStart(8)} ${"EV".padStart(7)}`);
   for (const r of rows.sort((a, b) => b.ev - a.ev)) {
     console.log(
