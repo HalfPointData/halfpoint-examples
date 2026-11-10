@@ -1,14 +1,14 @@
 // Positive EV scanner: compare sportsbook prices you supply with HalfPoint's fair price.
 //
 //   npx tsx positive-ev.ts nba                                  # fair odds from the sample, no key
-//   npx tsx positive-ev.ts nba nba-261110-cle-cha:home:+150     # the edge of one book price
+//   npx tsx positive-ev.ts nba nba-261110-cle-cha:home:+150     # the EV of one book price
 //   HALFPOINT_API_KEY=hp_... npx tsx positive-ev.ts nba ...     # against the current /odds
 //
 // You pass the sportsbook prices as arguments, each `<fixture id>:<outcome>:<odds>`. Odds are
 // decimal (`2.45`) or American (`+145`, `-120`). Outcomes are `home`, `away` and, in soccer,
 // `draw`. For each price it prints the fair probability p, the book's implied probability
-// 1/odds, the edge p - 1/odds, and the expected value per unit staked, p * odds - 1. A positive
-// EV means the book pays more than the fair price.
+// 1/odds, the difference (p - 1/odds) * 100 in percentage points, and the expected value per
+// unit staked, p * odds - 1. A positive EV means the book pays more than the fair price.
 //
 // Node 20+ (built-in fetch). Docs: https://docs.halfpoint.tech/endpoints/odds/
 
@@ -46,7 +46,7 @@ const americanOdds = (odds: number): string =>
   odds >= 2 ? `+${((odds - 1) * 100).toFixed(0)}` : `${(-100 / (odds - 1)).toFixed(0)}`;
 
 const pct = (x: number): string => `${x >= 0 ? "+" : ""}${(x * 100).toFixed(1)}%`;
-const signed = (x: number): string => `${x >= 0 ? "+" : ""}${x.toFixed(3)}`;
+const pp = (x: number): string => `${x >= 0 ? "+" : ""}${(x * 100).toFixed(1)}pp`;
 
 const [league, ...wanted] = args;
 if (!league) fail("usage: positive-ev.ts <league> [<fixture id>:<outcome>:<odds> ...]");
@@ -75,7 +75,7 @@ if (wanted.length === 0) {
     console.log(`${name.padEnd(36)} ${p.toFixed(3).padStart(7)} ${(1 / p).toFixed(2).padStart(8)} ${americanOdds(1 / p).padStart(9)}${note}`);
   }
 } else {
-  const rows: { name: string; odds: number; p: number; edge: number; ev: number }[] = [];
+  const rows: { name: string; odds: number; p: number; diff: number; ev: number }[] = [];
   for (const arg of wanted) {
     const cut = arg.lastIndexOf(":");
     if (cut < 0) fail(`cannot read ${arg}: expected <fixture id>:<outcome>:<odds>`);
@@ -90,13 +90,13 @@ if (wanted.length === 0) {
       console.error(`${arg}: the fair price is not recent; skipped`);
       continue;
     }
-    rows.push({ name, odds, p: entry.p, edge: entry.p - 1 / odds, ev: entry.p * odds - 1 });
+    rows.push({ name, odds, p: entry.p, diff: entry.p - 1 / odds, ev: entry.p * odds - 1 });
   }
 
-  console.log(`${"fixture:outcome".padEnd(36)} ${"odds".padStart(6)} ${"implied".padStart(8)} ${"fair p".padStart(7)} ${"edge".padStart(7)} ${"EV".padStart(7)}`);
+  console.log(`${"fixture:outcome".padEnd(36)} ${"odds".padStart(6)} ${"implied".padStart(8)} ${"fair p".padStart(7)} ${"diff".padStart(8)} ${"EV".padStart(7)}`);
   for (const r of rows.sort((a, b) => b.ev - a.ev)) {
     console.log(
-      `${r.name.padEnd(36)} ${r.odds.toFixed(2).padStart(6)} ${(1 / r.odds).toFixed(3).padStart(8)} ${r.p.toFixed(3).padStart(7)} ${signed(r.edge).padStart(7)} ${pct(r.ev).padStart(7)}${r.ev > 0 ? "  +EV" : ""}`,
+      `${r.name.padEnd(36)} ${r.odds.toFixed(2).padStart(6)} ${(1 / r.odds).toFixed(3).padStart(8)} ${r.p.toFixed(3).padStart(7)} ${(pp(r.diff)).padStart(8)} ${pct(r.ev).padStart(7)}${r.ev > 0 ? "  +EV" : ""}`,
     );
   }
 }
