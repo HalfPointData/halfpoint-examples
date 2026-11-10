@@ -2,7 +2,7 @@
 
 To devig odds is to remove the bookmaker's margin from a price, so the implied probabilities of all outcomes add up to 1. People do it to get a fair price to compare a sportsbook against.
 
-HalfPoint publishes one fair price per game, built from live order books and updated as they move. We filter out stale and off-market prices, so you get one clean price per game. Each outcome's price is a probability; probabilities are decimals from 0 to 1. The fair decimal odds are `1 / p`.
+HalfPoint publishes one fair price per game, built from live order books and updated as they move. We filter out stale and off-market prices, so you get one clean price per game. Probabilities are decimals from 0 to 1. The fair decimal odds are `1 / p`.
 
 To see how far a sportsbook price is from the fair price, run the distance from fair example:
 

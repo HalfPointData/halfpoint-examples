@@ -14,7 +14,7 @@ This repository has small, runnable examples for the HalfPoint API. Copy the exa
 
 Other folders: [`curl/`](curl/) has the same calls as shell scripts, [`mcp/`](mcp/) has MCP client configs, and [`x402/`](x402/) pays per request with x402 (it spends real money; do not run it unless the user asks).
 
-The examples take sportsbook prices as command-line arguments, in decimal (`2.45`) or American (`+145`, `-120`) odds. The API fields `home`, `away` and `draw` are probabilities; the examples compute fair decimal odds as `1 / p`.
+The examples take sportsbook prices as command-line arguments, in decimal (`2.45`) or American (`+145`, `-120`) odds. Probabilities are decimals from 0 to 1. The examples compute fair decimal odds as `1 / p`.
 
 ## Environment
 
