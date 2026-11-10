@@ -22,7 +22,7 @@ if (!league) fail("usage: line-movement.ts <league> [<fixture id>]");
 
 const key = env.HALFPOINT_API_KEY;
 const url = key ? `${ODDS}/odds?league=${league}` : `${ODDS}/sample/odds?league=${league}`;
-const interval = key ? 10_000 : 90_000; // ms between polls; the sample is delayed
+const interval = key ? 1_000 : 90_000; // ms between polls; the sample is delayed
 if (!key) console.error("No HALFPOINT_API_KEY: polling the delayed sample.");
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
